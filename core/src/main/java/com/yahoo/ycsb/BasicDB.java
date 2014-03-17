@@ -221,7 +221,7 @@ public class BasicDB extends DB
      * @param records The records mapped by record key.
      * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
      */
-    public abstract int batchInsert(String table, HashMap<String,HashMap<String,ByteIterator>> records){
+    public int batchInsert(String table, HashMap<String,HashMap<String,ByteIterator>> records){
         delay();
 
         if (verbose)

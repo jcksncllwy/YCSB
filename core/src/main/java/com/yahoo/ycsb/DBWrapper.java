@@ -160,7 +160,7 @@ public class DBWrapper extends DB
      * @param records The records mapped by record key.
      * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
      */
-    public abstract int batchInsert(String table, HashMap<String,HashMap<String,ByteIterator>> records){
+    public int batchInsert(String table, HashMap<String,HashMap<String,ByteIterator>> records){
         long st=System.nanoTime();
         int res=_db.batchInsert(table,key,values);
         long en=System.nanoTime();
