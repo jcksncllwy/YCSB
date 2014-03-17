@@ -214,6 +214,39 @@ public class BasicDB extends DB
 		return 0;
 	}
 
+    /**
+     * Insert a batch of records into the database.
+     *
+     * @param table The name of the table
+     * @param records The records mapped by record key.
+     * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
+     */
+    public abstract int batchInsert(String table, HashMap<String,HashMap<String,ByteIterator>> records){
+        delay();
+
+        if (verbose)
+        {
+            System.out.print("BATCH_INSERT "+table+" [ ");
+            if (values!=null)
+            {
+                for(String recordKey : records.keySet()){
+                    System.out.print(recordKey+"=[ ");
+                    HashMap<String,ByteIterator>> record = records[recordKey];
+                    for (String field : record.keySet())
+                    {
+                        System.out.print(field+"="+record.get(field)+" ");
+                    }
+                    System.out.print(" ] ");
+                }
+
+            }
+
+            System.out.println("]");
+        }
+
+        return 0;
+    }
+
 
 	/**
 	 * Delete a record from the database. 

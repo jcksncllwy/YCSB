@@ -139,6 +139,7 @@ class ClientThread extends Thread
 {
 	DB _db;
 	boolean _dotransactions;
+    boolean _fastload;
 	Workload _workload;
 	int _opcount;
 	double _target;

@@ -152,6 +152,23 @@ public class DBWrapper extends DB
 		return res;
 	}
 
+
+    /**
+     * Insert a batch of records into the database.
+     *
+     * @param table The name of the table
+     * @param records The records mapped by record key.
+     * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
+     */
+    public abstract int batchInsert(String table, HashMap<String,HashMap<String,ByteIterator>> records){
+        long st=System.nanoTime();
+        int res=_db.batchInsert(table,key,values);
+        long en=System.nanoTime();
+        _measurements.measure("INSERT",(int)((en-st)/1000));
+        _measurements.reportReturnCode("INSERT",res);
+        return res;
+    }
+
 	/**
 	 * Delete a record from the database. 
 	 *
