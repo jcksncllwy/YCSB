@@ -227,7 +227,7 @@ public class BasicDB extends DB
         if (verbose)
         {
             System.out.print("BATCH_INSERT "+table+" [ ");
-            if (values!=null)
+            if (records!=null)
             {
                 for(String recordKey : records.keySet()){
                     System.out.print(recordKey+"=[ ");

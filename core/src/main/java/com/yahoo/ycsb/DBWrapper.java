@@ -162,7 +162,7 @@ public class DBWrapper extends DB
      */
     public int batchInsert(String table, HashMap<String,HashMap<String,ByteIterator>> records){
         long st=System.nanoTime();
-        int res=_db.batchInsert(table,key,values);
+        int res=_db.batchInsert(table,records);
         long en=System.nanoTime();
         _measurements.measure("INSERT",(int)((en-st)/1000));
         _measurements.reportReturnCode("INSERT",res);
