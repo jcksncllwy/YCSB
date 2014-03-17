@@ -231,7 +231,7 @@ public class BasicDB extends DB
             {
                 for(String recordKey : records.keySet()){
                     System.out.print(recordKey+"=[ ");
-                    HashMap<String,ByteIterator>> record = records.get(recordKey);
+                    HashMap<String,ByteIterator> record = records.get(recordKey);
                     for (String field : record.keySet())
                     {
                         System.out.print(field+"="+record.get(field)+" ");
