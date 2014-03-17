@@ -88,6 +88,18 @@ public class CoreWorkload extends Workload
 
 	int fieldcount;
 
+    /**
+     * The name of the property for the number of records in a batch operation.
+     */
+    public static final String BATCH_SIZE_PROPERTY="batchsize";
+
+    /**
+     * Default number of records in a batch operation.
+     */
+    public static final String BATCH_SIZE_PROPERTY_DEFAULT="100";
+
+    int batchsize;
+
 	/**
 	 * The name of the property for the field length distribution. Options are "uniform", "zipfian" (favoring short records), "constant", and "histogram".
 	 * 
@@ -463,6 +475,27 @@ public class CoreWorkload extends Workload
 		else
 			return false;
 	}
+
+    /**
+     * Do one batch insert operation. Because it will be called concurrently from multiple client threads, this
+     * function must be thread safe. However, avoid synchronized, or the threads will block waiting for each
+     * other, and it will be difficult to reach the target throughput. Ideally, this function would have no side
+     * effects other than DB operations.
+     */
+    public boolean doBatchInsert(DB db, Object threadstate)
+    {
+        HashMap<String,HashMap<String, ByteIterator>> records = new HashMap<String,HashMap<String, ByteIterator>>();
+        for(int i=0; i<batchsize; i++){
+            int keynum=keysequence.nextInt();
+            String dbkey = buildKeyName(keynum);
+            HashMap<String, ByteIterator> values = buildValues();
+            records.put(dbkey,values);
+        }
+        if (db.batchInsert(table, records) == 0)
+            return true;
+        else
+            return false;
+    }
 
 	/**
 	 * Do one transaction operation. Because it will be called concurrently from multiple client threads, this 

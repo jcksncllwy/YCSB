@@ -162,11 +162,12 @@ class ClientThread extends Thread
 	 * @param opcount the number of operations (transactions or inserts) to do
 	 * @param targetperthreadperms target number of operations per thread per ms
 	 */
-	public ClientThread(DB db, boolean dotransactions, Workload workload, int threadid, int threadcount, Properties props, int opcount, double targetperthreadperms)
+	public ClientThread(DB db, boolean dotransactions, boolean fastload, Workload workload, int threadid, int threadcount, Properties props, int opcount, double targetperthreadperms)
 	{
 		//TODO: consider removing threadcount and threadid
 		_db=db;
 		_dotransactions=dotransactions;
+        _fastload=fastload;
 		_workload=workload;
 		_opcount=opcount;
 		_opsdone=0;
@@ -259,6 +260,40 @@ class ClientThread extends Thread
 					}
 				}
 			}
+            else if(_fastload){
+                long st=System.currentTimeMillis();
+
+                while (((_opcount == 0) || (_opsdone < _opcount)) && !_workload.isStopRequested())
+                {
+
+                    if (!_workload.doBatchInsert(_db,_workloadstate))
+                    {
+                        break;
+                    }
+
+                    _opsdone+=_workload.batchsize;
+
+                    //throttle the operations
+                    if (_target>0)
+                    {
+                        //this is more accurate than other throttling approaches we have tried,
+                        //like sleeping for (1/target throughput)-operation latency,
+                        //because it smooths timing inaccuracies (from sleep() taking an int,
+                        //current time in millis) over many operations
+                        while (System.currentTimeMillis()-st<((double)_opsdone)/_target)
+                        {
+                            try
+                            {
+                                sleep(1);
+                            }
+                            catch (InterruptedException e)
+                            {
+                                // do nothing.
+                            }
+                        }
+                    }
+                }
+            }
 			else
 			{
 				long st=System.currentTimeMillis();
@@ -348,6 +383,7 @@ public class Client
 		System.out.println("  -target n: attempt to do n operations per second (default: unlimited) - can also\n" +
 				"             be specified as the \"target\" property using -p");
 		System.out.println("  -load:  run the loading phase of the workload");
+        System.out.println("  -fastload:  run the loading phase of the workload with batch inserts and no benchmarks. The fastest way to load a data set.");
 		System.out.println("  -t:  run the transactions phase of the workload (default)");
 		System.out.println("  -db dbname: specify the name of the DB to use (default: com.yahoo.ycsb.BasicDB) - \n" +
 				"              can also be specified as the \"db\" property using -p");
@@ -435,6 +471,7 @@ public class Client
 		Properties props=new Properties();
 		Properties fileprops=new Properties();
 		boolean dotransactions=true;
+        boolean fastload=false;
 		int threadcount=1;
 		int target=0;
 		boolean status=false;
@@ -480,6 +517,12 @@ public class Client
 				dotransactions=false;
 				argindex++;
 			}
+            else if (args[argindex].compareTo("-fastload")==0)
+            {
+                dotransactions=false;
+                fastload=true;
+                argindex++;
+            }
 			else if (args[argindex].compareTo("-t")==0)
 			{
 				dotransactions=true;
@@ -718,7 +761,7 @@ public class Client
 				System.exit(0);
 			}
 
-			Thread t=new ClientThread(db,dotransactions,workload,threadid,threadcount,props,opcount/threadcount,targetperthreadperms);
+			Thread t=new ClientThread(db,dotransactions,fastload,workload,threadid,threadcount,props,opcount/threadcount,targetperthreadperms);
 
 			threads.add(t);
 			//t.start();

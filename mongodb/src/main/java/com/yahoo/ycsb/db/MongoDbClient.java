@@ -217,6 +217,48 @@ public class MongoDbClient extends DB {
     }
 
     /**
+     * Insert a batch of records into the database.
+     *
+     * @param table The name of the table
+     * @param records The records mapped by record key.
+     * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
+     */
+    @Override
+    public int insert(String table, String key,
+                      HashMap<String,HashMap<String,ByteIterator>> records) {
+        com.mongodb.DB db = null;
+        try {
+            db = mongo.getDB(database);
+
+            db.requestStart();
+
+            DBCollection collection = db.getCollection(table);
+
+            ArrayList<DBObject> dbRecords = new ArrayList<DBObject>();
+
+            for(String k : dbRecords.keySet()){
+                DBObject r = new BasicDBObject().append("_id", k);
+                HashMap<String,ByteIterator>> data = dbRecords[k];
+                for (String field : data.keySet()) {
+                    r.put(field, data.get(field).toArray());
+                }
+            }
+
+            WriteResult res = collection.insert(records, writeConcern);
+            return res.getError() == null ? 0 : 1;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return 1;
+        }
+        finally {
+            if (db != null) {
+                db.requestDone();
+            }
+        }
+    }
+
+    /**
      * Read a record from the database. Each field/value pair from the result will be stored in a HashMap.
      *
      * @param table The name of the table

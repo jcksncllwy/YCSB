@@ -126,6 +126,15 @@ public abstract class DB
 	 */
 	public abstract int insert(String table, String key, HashMap<String,ByteIterator> values);
 
+    /**
+     * Insert a batch of records into the database.
+     *
+     * @param table The name of the table
+     * @param records The records mapped by record key.
+     * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
+     */
+    public abstract int batchInsert(String table, HashMap<String,HashMap<String,ByteIterator>> records);
+
 	/**
 	 * Delete a record from the database. 
 	 *
