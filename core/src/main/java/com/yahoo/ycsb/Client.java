@@ -272,7 +272,7 @@ class ClientThread extends Thread
                         break;
                     }
 
-                    _opsdone+=_workload.batchsize;
+                    _opsdone+=_workload.getBatchsize();
 
                     //throttle the operations
                     if (_target>0)
@@ -704,7 +704,7 @@ public class Client
 		{
 			Class workloadclass = classLoader.loadClass(props.getProperty(WORKLOAD_PROPERTY));
 
-			workload=(Workload)workloadclass.newInstance();
+			workload=workloadclass.newInstance();
 		}
 		catch (Exception e) 
 		{  

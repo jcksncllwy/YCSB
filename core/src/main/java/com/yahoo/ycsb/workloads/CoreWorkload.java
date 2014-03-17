@@ -98,7 +98,7 @@ public class CoreWorkload extends Workload
      */
     public static final String BATCH_SIZE_PROPERTY_DEFAULT="100";
 
-    public int batchsize;
+    int batchsize;
 
 	/**
 	 * The name of the property for the field length distribution. Options are "uniform", "zipfian" (favoring short records), "constant", and "histogram".
@@ -439,6 +439,11 @@ public class CoreWorkload extends Workload
  		}
 		return "user"+keynum;
 	}
+
+    public int getBatchsize(){
+        return batchsize;
+    }
+
 	HashMap<String, ByteIterator> buildValues() {
  		HashMap<String,ByteIterator> values=new HashMap<String,ByteIterator>();
 
