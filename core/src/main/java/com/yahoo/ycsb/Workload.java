@@ -82,6 +82,15 @@ public abstract class Workload
        * synchronized, since each thread has its own threadstate instance.
        */
       public abstract boolean doInsert(DB db, Object threadstate);
+
+      /**
+       * Do one batch insert operation.Because it will be called concurrently from multiple client threads, this
+       * function must be thread safe. However, avoid synchronized, or the threads will block waiting for each
+       * other, and it will be difficult to reach the target throughput. Ideally, this function would have no side
+       * effects other than DB operations and mutations on threadstate. Mutations to threadstate do not need to be
+       * synchronized, since each thread has its own threadstate instance.
+       */
+      public abstract boolean doBatchInsert(DB db, Object threadstate);
       
       /**
        * Do one transaction operation. Because it will be called concurrently from multiple client threads, this 

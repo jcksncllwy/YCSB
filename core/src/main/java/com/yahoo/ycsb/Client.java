@@ -369,6 +369,13 @@ public class Client
 	 * should support the "insertstart" property, which tells them which record to start at.
 	 */
 	public static final String INSERT_COUNT_PROPERTY="insertcount";
+
+    /**
+     * Indicates how many batch inserts to do. Useful for partitioning
+     * the load among multiple servers, if the client is the bottleneck. Additionally, workloads
+     * should support the "insertstart" property, which tells them which record to start at.
+     */
+    public static final String BATCH_INSERT_COUNT_PROPERTY="batchinsertcount";
 	
 	/**
    * The maximum amount of time (in seconds) for which the benchmark will be run.
@@ -704,7 +711,7 @@ public class Client
 		{
 			Class workloadclass = classLoader.loadClass(props.getProperty(WORKLOAD_PROPERTY));
 
-			workload=workloadclass.newInstance();
+			workload=(Workload)workloadclass.newInstance();
 		}
 		catch (Exception e) 
 		{  
@@ -735,6 +742,13 @@ public class Client
 		{
 			opcount=Integer.parseInt(props.getProperty(OPERATION_COUNT_PROPERTY,"0"));
 		}
+        else if(fastload){
+            if (props.containsKey(BATCH_INSERT_COUNT_PROPERTY))
+            {
+                opcount=Integer.parseInt(props.getProperty(BATCH_INSERT_COUNT_PROPERTY,"0"));
+            }
+
+        }
 		else
 		{
 			if (props.containsKey(INSERT_COUNT_PROPERTY))
